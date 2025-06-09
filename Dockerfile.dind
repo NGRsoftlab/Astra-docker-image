@@ -1,0 +1,105 @@
+## Definite image args
+ARG image_registry
+ARG image_name=docker
+ARG image_version=25.0-astra1.8.2-slim
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                         Base image                          #
+#               First stage, prepare environment              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+FROM ${image_registry}${image_name}:${image_version} AS base-stage
+
+SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
+
+ARG dind_additional_tools='curl sshpass jq xmlstarlet yq'
+
+## ENV for build args
+ENV \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    TERM=linux \
+    TZ=Etc/UTC
+
+## Install docker rootless mode and adapt for dind
+## Always use the latest version available for the current DEB distribution
+RUN \
+    --mount=type=bind,source=./scripts,target=/usr/local/sbin,readonly \
+    apt-install.sh \
+## Dind tools
+        docker.io \
+## Dockerd tools
+        ## cert generate
+        openssl \
+        ## storage driver BTRFS
+        btrfs-progs \
+        ## EXT2/3/4 fs and raw disk
+        e2fsprogs \
+        ## XFS fs
+        xfsprogs \
+        ## network configuration
+        iptables \
+        ## parallel gzip use: tar --use-compress-program=pigz
+        pigz \
+        ## ip
+        iproute2 \
+        ## modprobe
+        kmod \
+        ## SCM
+        git \
+## Additional tools
+        ${dind_additional_tools} \
+## Set environment
+    && docker-set-environment.sh "docker.io" "dind" \
+## Remove cache
+    && apt-clean.sh \
+## Smoke test
+    && dockerd --version \
+    && containerd --version \
+    && ctr --version \
+    && runc --version
+
+## Prune unused files
+RUN \
+    find /tmp/ ! -type d -ls -delete \
+    && { \
+        find /run/ -mindepth 1 -ls -delete || :; \
+    } \
+## Ensure '.exe' extension is not exits
+    && find "/usr/" -iname '*.exe' -ls -delete \
+    && install -d -m 01777 /run/lock
+
+COPY ./configuration/dockerd-entrypoint.sh /usr/local/bin/
+COPY ./configuration/dind.sh /usr/local/bin/
+COPY ./configuration/docker-entrypoint-cli.sh /usr/local/bin/docker-entrypoint.sh
+COPY ./configuration/modprobe.sh /usr/local/bin/modprobe
+
+## Deduplication clean
+RUN --mount=type=bind,source=./scripts,target=/usr/local/sbin,readonly dedup-clean.sh /usr/
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                        Final image                          #
+#             Second stage, compact optimize layer            #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+FROM scratch
+
+COPY --from=base-stage / /
+
+## Set base label
+LABEL \
+    maintainer="Vladislav Avdeev" \
+    organization="NGRSoftlab"
+
+## Set environment
+ENV \
+    LANG='en_US.UTF8' \
+    LC_ALL='en_US.UTF8' \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+    TERM='xterm-256color' \
+    TZ=Etc/UTC \
+    DEBIAN_FRONTEND='noninteractive'
+
+VOLUME /var/lib/docker
+EXPOSE 2375 2376
+
+ENTRYPOINT [ "dockerd-entrypoint.sh" ]
+CMD []

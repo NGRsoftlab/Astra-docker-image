@@ -1,0 +1,11 @@
+.idea
+tmp
+test.sh
+*.key
+*.crt
+*.pem
+certs
+*.conf
+test/
+efficiency.json
+configuration/docker-entr.sh

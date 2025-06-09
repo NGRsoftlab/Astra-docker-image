@@ -1,0 +1,31 @@
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.sh]
+# like -i=2
+indent_style = space
+indent_size = 2
+
+shell_variant      = bash # like -ln=bash
+binary_next_line   = true  # like -bn
+switch_case_indent = true  # like -ci
+keep_padding       = true  # like -kp
+never_split        = true  # like -ns
+# space_redirects    = true  # like -sr
+# function_next_line = true  # like -fn
+
+[*/**.json]
+indent_style = tab
+indent_size = 4
+
+[*/**.js]
+charset = utf-8
+indent_style = tab
+indent_size = 4
+
+[Makefile]
+indent_style = tab

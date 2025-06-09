@@ -1,0 +1,45 @@
+ARG image_registry
+ARG image_name=docker
+ARG image_version=25.0-dind-astra1.8.2-slim
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                         Base image                          #
+#               First stage, prepare environment              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+FROM ${image_registry}${image_name}:${image_version} AS base-stage
+
+SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
+
+ARG dind_additional_tools='curl sshpass jq xmlstarlet yq'
+
+## Install docker rootless mode and adapt for dind
+## Always use the latest version available for the current DEB distribution
+RUN \
+    --mount=type=bind,source=./scripts,target=/usr/local/sbin,readonly \
+    apt-install.sh \
+## Dind rootless tools
+        fuse-overlayfs \
+        rootlesskit \
+        slirp4netns \
+## Additional tools
+        ${dind_additional_tools} \
+## Set environment
+    && docker-set-environment.sh "rootlesskit" "dind_rootless" \
+## Smoke test
+    && rootlesskit --version \
+    && slirp4netns --version \
+## "/run/user/UID" will be used by default as the value of XDG_RUNTIME_DIR
+    && install --verbose --directory --mode 1777 "/run/user" \
+## Create a default user preconfigured for running rootless dockerd
+    && useradd --uid 1000 --shell /bin/bash --create-home rootless \
+    && echo 'rootless:100000:65536' >> /etc/subuid \
+    && echo 'rootless:100000:65536' >> /etc/subgid \
+## Pre-create "/var/lib/docker" for our rootless user
+    && install --verbose --directory --owner rootless --group rootless "/home/rootless/.local/share/docker" \
+## Remove cache
+    && apt-clean.sh \
+## Deduplication clean
+    && dedup-clean.sh /usr/
+
+VOLUME /home/rootless/.local/share/docker
+USER rootless

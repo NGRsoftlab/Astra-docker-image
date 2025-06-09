@@ -1,0 +1,57 @@
+###############################################################################
+# attribute       # Checkin behavior # Checkout behavior
+###############################################################################
+# text            # Normalized to LF # Convert to native line endings
+# [text] eol=crlf # Normalized to LF # Convert to CRLF
+# [text] eol=lf   # Normalized to LF # Convert to LF
+# -text or binary # No conversion    # No conversion
+# text=auto       # Like "text" if text file according to git, otherwise, like "binary"
+# unspecified     # Fall back to core.autocrlf setting of local environment
+###############################################################################
+# core.autocrlf
+#   false: same as binary
+#   true:  same as eol=crlf
+#   input: same as eol=lf
+
+###############################################################################
+# Set default behavior to automatically normalize line endings.
+###############################################################################
+
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Declare files that will always have LF line endings on checkout.
+*.awk              text eol=lf
+*.sed              text eol=lf
+*.sh               text eol=lf
+
+*.md               text
+
+# Denote all files that are truly binary and should not be modified.
+*.png              binary
+*.jpg              binary
+*.ttf              binary
+ufix               binary
+
+# Stop autolf
+#*.MF                    text eol=crlf
+#*.backup                text eol=crlf
+#*.bak                   text eol=crlf
+#*.css                   text eol=crlf
+#*.fml                   text eol=crlf
+#*.html                  text eol=crlf
+#*.java                  text eol=crlf
+#*.js                    text eol=crlf
+#*.json                  text eol=crlf
+#*.jsp                   text eol=crlf
+#*.md                    text eol=crlf
+#*.mib                   text eol=crlf
+#*.properties            text eol=crlf
+#*.scss                  text eol=crlf
+#*.sql                   text eol=crlf
+#*.svg                   text eol=crlf
+#*.txt                   text eol=crlf
+#*.xml                   text eol=crlf
+#*userUnlockApproval     text eol=crlf
+#*userLockedViaLDAPCheck text eol=crlf
+#*userGroupChanged       text eol=crlf
