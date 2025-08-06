@@ -216,6 +216,7 @@ repos:
 
       - id: check-png-size
         name: "📁 filesystem/📝 file · Check image size"
+        # bash -c 'find . \( -name '*.png' -o -name '*.webp' -o -name '*.svg' -o -name '*.jpg' \) -size +500k -exec echo "[ERROR]: {} is too large" \; | grep '.' && exit 1 || true'
         entry: |
-          bash -c 'find . \( -name '*.png' -o -name '*.webp' -o -name '*.svg' -o -name '*.jpg' \) -size +500k -exec echo "[ERROR]: {} is too large" \; | grep '.' && exit 1 || true'
+          bash -c 'git diff --cached --name-only | grep -Ei "\\.(svg|png|webp|jpe?g)\$" | while read -r f; do size=$(wc -c < "${f}"); if [[ ${size} -gt 512000 ]]; then echo "[ERROR]: ${f} is too large (${size} bytes > 500KB)" >&2; exit 1; fi; done'
         language: system

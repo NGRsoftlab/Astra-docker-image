@@ -27,7 +27,23 @@
 
 **Docker in Docker** - это реализация `DinD` на базе Astra Linux
 
-::include{file=docs/integration.md}
+Присоединяйтесь к нашим социальным сетям:
+
+<!-- markdownlint-disable MD033 -->
+
+<div class="badges-row-public">
+  <h4 align="center">
+    <a href="https://t.me/NGR_Softlab">
+      <img src="https://shields.io/badge/ngr-telegram-blue?logo=telegram&style=for-the-badge" alt="NGR Social Telegram" height="40" />
+    </a>
+    &emsp; &emsp; &emsp;
+    <a href="https://www.ngrsoftlab.ru/?utm_source=tg&utm_medium=start" >
+      <img src="https://shields.io/badge/ngr-web--page-yellow?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjIyLjcgMCA1MS45IDUxLjciPjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNzQuNSAwSDYzLjhsMy42IDMuNWMuNy43LjcgMS45IDAgMi43LS43LjctMS45LjctMi42IDBMNTguOSAwSDUzbDE0LjUgMTMuOWMuNy43LjcgMS45IDAgMi43LS43LjctMS45LjctMi42IDBMNDkgMGgtNi44bDI1LjMgMjQuM2MuNy43LjcgMS45IDAgMi43LS43LjctMS45LjctMi42IDBMMzkgMGgtNy43bDM2LjEgMzQuN2MuNy43LjcgMS45IDAgMi42cy0xLjkuNy0yLjYgMEwyOSAwYy0zLjUuNC02LjMgMy40LTYuMyA3djQ0LjdoMTAuNmwtMy42LTMuNGMtLjctLjctLjctMS45IDAtMi42czEuOS0uNyAyLjcgMGw1LjggNmg1LjlMMjkuNyAzNy45Yy0uNy0uNy0uNy0xLjkgMC0yLjcuNy0uNyAxLjktLjcgMi43IDBsMTUuOCAxNi40SDU1TDI5LjggMjcuNGMtLjctLjctLjctMS45IDAtMi43LjctLjcgMS45LS43IDIuNyAwbDI1LjggMjYuOEg2NkwyOS45IDE2LjljLS43LS43LS43LTEuOSAwLTIuNnMxLjktLjcgMi43IDBsMzUuNyAzNy4yYzMuNS0uMyA2LjMtMy4zIDYuMy03VjB6IiBmaWxsPSIjRjhBRDAwIi8+PC9zdmc+" alt="NGR Social Media" height="40" />
+    </a>
+  </h4>
+</div>
+
+<!-- markdownlint-enable MD033 -->
 
 ## Contents
 
@@ -51,6 +67,7 @@
   - [How to use in CI](#how-to-use-in-ci)
   - [Issues and solutions](#issues-and-solutions)
   - [Miscellaneous](#miscellaneous)
+    - [Cya!](#cya)
 
 ## [Supported Technologies](#contents)
 
@@ -59,6 +76,8 @@
 | :-------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------: | :---------------- |
 | ![Astra 1.8](https://img.shields.io/badge/Astra-1.8.x-00ADD8?style=flat&logo=astra&logoColor=white) | ![Docker 25.0](https://img.shields.io/badge/docker-25.0-%230db7ed.svg?style=flat&logo=docker&logoColor=white) | ✅ Fully supported |
 
+<div align="center"> <sub> Таблица 1. Поддерживаемые ОС-ы. </sub> </div>
+<p>&nbsp;</p>
 <!-- markdownlint-enable MD033 -->
 
 ## [What is it](#contents)
@@ -89,12 +108,10 @@ pre-commit installed at .git/hooks/commit-msg
 pre-commit installed at .git/hooks/pre-push
 ```
 
->>> [!warning] Предупреждение
-
-- Чтобы проверить свои изменения, воспользуйтесь командой `pre-commit run --all-files`
-- Чтобы проверить конкретную задачу, воспользуетесь командой `pre-commit run <target> --all-files`
-- Если Вы понимаете что творите и хотите пропустить проверку `pre-commit`-ом воспользуйтесь `--no-verify`, пример `git commit -m "Добавил изменения и не хочу проверки" --no-verify`
->>>
+> [!warning]
+> Чтобы проверить свои изменения, воспользуйтесь командой `pre-commit run --all-files`.
+> Чтобы проверить конкретную задачу, воспользуетесь командой `pre-commit run <target> --all-files`.
+> Если Вы понимаете что творите и хотите пропустить проверку `pre-commit`-ом воспользуйтесь `--no-verify`, пример `git commit -m "Добавил изменения и не хочу проверки" --no-verify`
 
 Собрать образ `Astra Linux based`:
 
@@ -154,6 +171,11 @@ pre-commit installed at .git/hooks/pre-push
 | `image_version`         |           1.8.2-slim            | string |                                                               Версия образа. |
 | `dind_additional_tools` | 'curl sshpass jq xmlstarlet yq' | string | Список дополнительных пакетов, которые будут установлены вместе с основными. |
 
+<!-- markdownlint-disable MD033 -->
+<div align="center"> <sub> Таблица 2. Переопределяемые аргументы для сборки образа. </sub> </div>
+<p>&nbsp;</p>
+<!-- markdownlint-enable MD033 -->
+
 ### [Assembly order](#contents)
 
 Порядок сборки образов:
@@ -172,7 +194,7 @@ docker run --privileged --name some-docker -d \
   docker:"${DIND_VERSION}"
 ```
 
-> [!note] Примечание
+> [!note]
 > `--privileged` требуется для правильной работы Docker-in-Docker, но его следует использовать с осторожностью, поскольку он обеспечивает полный доступ к среде хоста, как описано [в соответствующем разделе документации Docker](https://docs.docker.com/engine/containers/run/#runtime-privilege-and-linux-capabilities)
 
 ### [How to work with rootless](#contents)
@@ -228,7 +250,7 @@ USER rootless
 - `server`: `dockerd` файлы сертификатов демона(`cert.pem`, `ca.pem`, `key.pem`)
 - `client`: `docker` файлы сертификатов клиента(`cert.pem`, `ca.pem`, `key.pem`; подходит для `DOCKER_CERT_PATH`)
 
-> [!warning] Предупреждение
+> [!warning]
 > Чтобы использовать эту функцию из 'клиентского' контейнера, необходимо, чтобы `client` подкаталог каталога `${DOCKER_TLS_CERTDIR}` был общим
 
 Чтобы отключить это поведение, переопределите команду контейнера или точку входа для `dockerd`(... `docker:"${DIND_VERSION}" dockerd` ... или ... `--entrypoint dockerd docker:"${DIND_VERSION}"` ...)
@@ -276,7 +298,7 @@ docker run --rm --privileged --name some-docker \
   docker:"${DIND_VERSION}"
 ```
 
-> [!warning] Предупреждение
+> [!warning]
 > Некоторые из них не будут поддерживаться в зависимости от настроек на хосте `dockerd`, например `--ulimit nofile=-1`, выдавая ошибки, которые выглядят как `error setting rlimit type 7: operation not permitted`, а некоторые могут наследовать разумные значения от экземпляра хоста `dockerd` или могут не применяться для Вашего использования Docker-in-Docker(например установить `--oom-score-adj` значение, которое выше, чем `dockerd` на хосте, чтобы Ваш экземпляр Docker-in-Docker был завершен до завершения экземпляра хоста Docker)
 
 ### [Environment variables](#contents)
@@ -289,6 +311,11 @@ docker run --rm --privileged --name some-docker \
 | `DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS` |          ''           | string  |                                                                                                  Дополнительные параметры запуска для `rootlesskit`. |
 | `DOCKERD_ROOTLESS_ROOTLESSKIT_NET`   |      slirp4netns      | string  |                                         Дополнительные параметры запуска для сети(net) `rootlesskit`. По умолчанию используется пакет `slirp4netns`. |
 | `DOCKERD_ROOTLESS_ROOTLESSKIT_MTU`   |         65520         | integer |       Дополнительные параметры запуска для сети(mtu) `rootlesskit`. По умолчанию используется оптимальное значение для пакета `slirp4netns` - 65520. |
+
+<!-- markdownlint-disable MD033 -->
+<div align="center"> <sub> Таблица 3. Переопределяемые переменные среды. </sub> </div>
+<p>&nbsp;</p>
+<!-- markdownlint-enable MD033 -->
 
 ## [Where to store data](#contents)
 
@@ -613,7 +640,16 @@ ______           _             _      ______           _
 $ aasvg --source --embed < docs/ascii.txt > docs/images/logo.svg
 ```
 
-::include{file=docs/cya.md}
+<!-- markdownlint-disable MD033 MD041 MD051 -->
+<table align="center"><tr><td align="center" width="9999">
+<img src="docs/images/cya.png" align="center" alt="Docker mascot">
+
+<div align="center"> <sub> Docker mascot. </sub> </div>
+
+### [Cya!](#contents)
+
+</td></tr></table>
+<!-- markdownlint-enable MD033 MD041 MD051 -->
 
 ---
 
