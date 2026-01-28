@@ -30,7 +30,7 @@ repos:
         exclude: ^(tests|mock_data)/
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.30.0
     hooks:
       - id: gitleaks
         name: "🔒 security · Detect hardcoded secrets by gitleaks"
@@ -38,7 +38,7 @@ repos:
 # --------------------------- 🔍 Code Quality Tools -------------------------- #
   ### Markdown ###
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.18.1
+    rev: v0.20.0
     hooks:
       - id: markdownlint-cli2
         name: "📝 markdown · Format markdown via markdownlint-cli2"
@@ -46,7 +46,7 @@ repos:
 
   ### Shell/Bash ###
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         name: "🐚 shell · Lint shell scripts"
@@ -95,14 +95,14 @@ repos:
 
   ### Docker ###
   - repo: https://github.com/hadolint/hadolint.git
-    rev: v2.13.1-beta
+    rev: v2.14.0
     hooks:
       - id: hadolint-docker
         name: "🐋 docker · Lint Dockerfile"
 
   ### PNG Images ###
   - repo: https://github.com/shssoichiro/oxipng
-    rev: v9.1.5
+    rev: v10.1.0
     hooks:
       - id: oxipng
         name: "🖼️ images · Optimize PNG files"
@@ -110,7 +110,7 @@ repos:
 
 # ---------------------------- 📁 Filesystem Tools --------------------------- #
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       # Filesystem Checks
       - id: trailing-whitespace

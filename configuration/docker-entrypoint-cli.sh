@@ -13,7 +13,7 @@ fi
 # shellcheck disable=SC2163
 if [[ -f /etc/environment ]]; then
   while IFS= read -r line; do
-    [ -z "${line}" ] && continue
+    [[ -z ${line} ]] && continue
     case "${line}" in
       \#*) continue ;;
       *) export "${line}" ;;
