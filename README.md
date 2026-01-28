@@ -72,8 +72,8 @@
 ## [Supported Technologies](#contents)
 
 <!-- markdownlint-disable MD033 -->
-|                                                 OS                                                  |                                                    Docker                                                     | Status            |
-| :-------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------: | :---------------- |
+|                                                 OS                                                  |                                                    Docker                                                     | Status             |
+| :-------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------: | :----------------- |
 | ![Astra 1.8](https://img.shields.io/badge/Astra-1.8.x-00ADD8?style=flat&logo=astra&logoColor=white) | ![Docker 25.0](https://img.shields.io/badge/docker-25.0-%230db7ed.svg?style=flat&logo=docker&logoColor=white) | ✅ Fully supported |
 
 <div align="center"> <sub> Таблица 1. Поддерживаемые ОС-ы. </sub> </div>
@@ -82,7 +82,7 @@
 
 ## [What is it](#contents)
 
-Docker — это проект с открытым исходным кодом, который автоматизирует развертывание приложений внутри программных контейнеров, предоставляя дополнительный уровень абстракции и автоматизации виртуализации на уровне операционной системы в Linux, Mac OS и Windows. Образ построен на основе отечественной ОС Astra Linux. Проект реализован на основе [официального репозитория Docker](https://hub.docker.com/_/docker)
+Docker - это проект с открытым исходным кодом, который автоматизирует развертывание приложений внутри программных контейнеров, предоставляя дополнительный уровень абстракции и автоматизации виртуализации на уровне операционной системы в Linux, Mac OS и Windows. Образ построен на основе отечественной ОС Astra Linux. Проект реализован на основе [официального репозитория Docker](https://hub.docker.com/_/docker)
 
 Прежде чем запускать Docker-in-Docker, обязательно прочтите [публикацию в блоге Жерома Петаццони на эту тему](https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/)⁠, где он описывает некоторые плюсы и минусы такого подхода(а также некоторые неприятные подводные камни, с которыми Вы можете столкнуться). Если Вы по-прежнему убеждены, что Вам нужен Docker-in-Docker, а не просто доступ к серверу Docker, на котором размещен контейнер, то читайте дальше
 
@@ -285,7 +285,6 @@ docker run --privileged --name some-docker -d \
   --pids-limit -1 \
   --oom-score-adj -500 \
   docker:"${DIND_VERSION}"
-
 ```
 
 ```console
@@ -329,9 +328,9 @@ docker run --rm --privileged --name some-docker \
 1. Создайте каталог данных на подходящем томе вашей хост-системы, например `/my/own/var-lib-docker`.
 2. Запустите `docker` контейнер следующим образом:
 
-```console
-docker run --privileged --name some-docker -v /my/own/var-lib-docker:/var/lib/docker -d docker:"${DIND_VERSION}"
-```
+    ```console
+    docker run --privileged --name some-docker -v /my/own/var-lib-docker:/var/lib/docker -d docker:"${DIND_VERSION}"
+    ```
 
 Часть `-v /my/own/var-lib-docker:/var/lib/docker` команды монтирует `/my/own/var-lib-docker` каталог из базовой хост-системы как `/var/lib/docker` внутри контейнера, куда Docker по умолчанию будет записывать свои файлы
 

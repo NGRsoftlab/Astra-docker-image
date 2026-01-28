@@ -28,16 +28,15 @@ __tls_san() {
       hostname -f
       hostname -s
     } | sed 's/^/DNS:/'
-    [ -z "${DOCKER_TLS_SAN:-}" ] || echo "${DOCKER_TLS_SAN}"
+    [[ -z ${DOCKER_TLS_SAN:-} ]] || echo "${DOCKER_TLS_SAN}"
   } | sort -u | xargs printf '%s,' | sed 's/,$//'
 }
 
 ## Generate private certificate
 __tls_generate_certs() {
-  local DIR CERT_VALID_DAYS
-  DIR="${1}"
+  local dir="${1}"
   ## https://github.com/FiloSottile/mkcert/issues/174
-  CERT_VALID_DAYS='825'
+  local cert_valid_days='825'
 
   shift
 
@@ -47,68 +46,71 @@ __tls_generate_certs() {
   ## If ca/key.pem, generate client public
   ## (regenerating public certs every startup to account for SAN/IP changes and/or expiration)
 
-  if [[ -s "${DIR}/server/ca.pem" && -s "${DIR}/server/cert.pem" && -s "${DIR}/server/key.pem" && ! -s "${DIR}/ca/key.pem" ]]; then
-    openssl verify -CAfile "${DIR}/server/ca.pem" "${DIR}/server/cert.pem"
+  if [[ -s "${dir}/server/ca.pem" && -s "${dir}/server/cert.pem" && -s "${dir}/server/key.pem" && ! -s "${dir}/ca/key.pem" ]]; then
+    openssl verify -CAfile "${dir}/server/ca.pem" "${dir}/server/cert.pem"
     return 0
   fi
 
-  if [[ -s "${DIR}/ca/key.pem" || ! -s "${DIR}/ca/cert.pem" ]]; then
-    ## If we either have a CA private key or do *not* have a CA public key, then we should create/manage the CA
-    mkdir -p "${DIR}/ca"
-    __tls_ensure_private "${DIR}/ca/key.pem"
-    openssl req -new -key "${DIR}/ca/key.pem" \
-      -out "${DIR}/ca/cert.pem" \
-      -subj '/CN=docker:dind CA' -x509 -days "${CERT_VALID_DAYS}"
+  if [[ -s "${dir}/ca/key.pem" || ! -s "${dir}/ca/cert.pem" ]]; then
+    ## If we either have a CA private key or do *not* have a CA public key,
+    ## then we should create/manage the CA
+    mkdir -p "${dir}/ca"
+    __tls_ensure_private "${dir}/ca/key.pem"
+    openssl req -new -key "${dir}/ca/key.pem" \
+      -out "${dir}/ca/cert.pem" \
+      -subj '/CN=docker:dind CA' -x509 -days "${cert_valid_days}"
   fi
 
-  if [[ -s "${DIR}/ca/key.pem" ]]; then
+  if [[ -s "${dir}/ca/key.pem" ]]; then
     ## If we have a CA private key, we should create/manage a server key
-    mkdir -p "${DIR}/server"
-    __tls_ensure_private "${DIR}/server/key.pem"
-    openssl req -new -key "${DIR}/server/key.pem" \
-      -out "${DIR}/server/csr.pem" \
+    mkdir -p "${dir}/server"
+    __tls_ensure_private "${dir}/server/key.pem"
+    openssl req -new -key "${dir}/server/key.pem" \
+      -out "${dir}/server/csr.pem" \
       -subj '/CN=docker:dind server'
-    cat >"${DIR}/server/openssl.cnf" <<-EOF
+    cat >"${dir}/server/openssl.cnf" <<-EOF
 [ x509_exts ]
 subjectAltName = $(__tls_san)
 EOF
     openssl x509 -req \
-      -in "${DIR}/server/csr.pem" \
-      -CA "${DIR}/ca/cert.pem" \
-      -CAkey "${DIR}/ca/key.pem" \
+      -in "${dir}/server/csr.pem" \
+      -CA "${dir}/ca/cert.pem" \
+      -CAkey "${dir}/ca/key.pem" \
       -CAcreateserial \
-      -out "${DIR}/server/cert.pem" \
-      -days "${CERT_VALID_DAYS}" \
-      -extfile "${DIR}/server/openssl.cnf" \
+      -out "${dir}/server/cert.pem" \
+      -days "${cert_valid_days}" \
+      -extfile "${dir}/server/openssl.cnf" \
       -extensions x509_exts
-    cp "${DIR}/ca/cert.pem" "${DIR}/server/ca.pem"
-    openssl verify -CAfile "${DIR}/server/ca.pem" "${DIR}/server/cert.pem"
+    cp "${dir}/ca/cert.pem" "${dir}/server/ca.pem"
+    openssl verify -CAfile "${dir}/server/ca.pem" "${dir}/server/cert.pem"
   fi
 
-  if [[ -s "${DIR}/ca/key.pem" ]]; then
+  if [[ -s "${dir}/ca/key.pem" ]]; then
     ## If we have a CA private key, we should create/manage a client key
-    mkdir -p "${DIR}/client"
-    __tls_ensure_private "${DIR}/client/key.pem"
-    chmod 0644 "${DIR}/client/key.pem" ## Openssl defaults to 0600 for the private key, but this one needs to be shared with arbitrary client contexts
+    mkdir -p "${dir}/client"
+    __tls_ensure_private "${dir}/client/key.pem"
+    ## Openssl defaults to 0600 for the private key,
+    ## but this one needs to be shared with arbitrary client contexts
+    chmod 0644 "${dir}/client/key.pem"
     openssl req -new \
-      -key "${DIR}/client/key.pem" \
-      -out "${DIR}/client/csr.pem" \
+      -key "${dir}/client/key.pem" \
+      -out "${dir}/client/csr.pem" \
       -subj '/CN=docker:dind client'
-    cat >"${DIR}/client/openssl.cnf" <<-'EOF'
+    cat >"${dir}/client/openssl.cnf" <<-'EOF'
 [ x509_exts ]
 extendedKeyUsage = clientAuth
 EOF
     openssl x509 -req \
-      -in "${DIR}/client/csr.pem" \
-      -CA "${DIR}/ca/cert.pem" \
-      -CAkey "${DIR}/ca/key.pem" \
+      -in "${dir}/client/csr.pem" \
+      -CA "${dir}/ca/cert.pem" \
+      -CAkey "${dir}/ca/key.pem" \
       -CAcreateserial \
-      -out "${DIR}/client/cert.pem" \
-      -days "${CERT_VALID_DAYS}" \
-      -extfile "${DIR}/client/openssl.cnf" \
+      -out "${dir}/client/cert.pem" \
+      -days "${cert_valid_days}" \
+      -extfile "${dir}/client/openssl.cnf" \
       -extensions x509_exts
-    cp "${DIR}/ca/cert.pem" "${DIR}/client/ca.pem"
-    openssl verify -CAfile "${DIR}/client/ca.pem" "${DIR}/client/cert.pem"
+    cp "${dir}/ca/cert.pem" "${dir}/client/ca.pem"
+    openssl verify -CAfile "${dir}/client/ca.pem" "${dir}/client/cert.pem"
   fi
 }
 
@@ -116,7 +118,7 @@ EOF
 # shellcheck disable=SC2163
 if [[ -f /etc/environment ]]; then
   while IFS= read -r line; do
-    [ -z "${line}" ] && continue
+    [[ -z ${line} ]] && continue
     case "${line}" in
       \#*) continue ;;
       *) export "${line}" ;;
@@ -131,7 +133,8 @@ fi
 
 ## First arg is `-f` or `--some-option`
 if [[ $# -eq 0 || ${1#-} != "${1}" ]]; then
-  ## Set "DOCKER_SOCKET" to the default "--host" *unix socket* value (for both standard or rootless)
+  ## Set "DOCKER_SOCKET" to the default "--host" *unix socket* value
+  ## (for both standard or rootless)
   CURRENT_UID="$(id -u)"
   if [[ ${CURRENT_UID} -eq 0 ]]; then
     DOCKER_SOCKET='unix:///var/run/docker.sock'
@@ -232,12 +235,13 @@ if [[ ${1} == 'dockerd' ]]; then
       ${DOCKERD_ROOTLESS_ROOTLESSKIT_FLAGS:-} \
       "$@"
 
-  elif [ -x '/usr/local/bin/dind' ]; then
+  elif [[ -x '/usr/local/bin/dind' ]]; then
     ## If we have the (mostly defunct now) Docker-in-Docker wrapper script, use it
     set -- '/usr/local/bin/dind' "$@"
   fi
 else
-  ## If it isn't `dockerd` we're trying to run, pass it through `docker-entrypoint.sh` so it gets `DOCKER_HOST` set appropriately too
+  ## If it isn't `dockerd` we're trying to run, pass it through
+  ## `docker-entrypoint.sh` so it gets `DOCKER_HOST` set appropriately too
   set -- docker-entrypoint.sh "$@"
 fi
 

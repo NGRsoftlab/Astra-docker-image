@@ -72,6 +72,15 @@ RUN \
 ## Ensure '.exe' extension is not exits
     && find "/usr/" -iname '*.exe' -ls -delete \
     && install -d -m 01777 /run/lock \
+## Get image package dump
+    && mkdir -p /usr/share/rocks \
+    && ( \
+        echo "# os-release" && cat /etc/os-release \
+        && echo "# dpkg-query" \
+        && dpkg-query -f \
+            '${db:Status-Abbrev},${binary:Package},${Version},${source:Package},${Source:Version}\n' \
+            -W \
+        ) >/usr/share/rocks/dpkg.query \
 ## Check can be preview /etc/issue
     && { \
         grep -qF 'cat /etc/issue' /etc/bash.bashrc \
