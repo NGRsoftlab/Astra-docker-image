@@ -16,7 +16,8 @@ ARG dind_additional_tools='curl sshpass jq xmlstarlet yq'
 ## Always use the latest version available for the current DEB distribution
 RUN \
     --mount=type=bind,source=./scripts,target=/usr/local/sbin,readonly \
-    apt-install.sh \
+    mkdir -p /run/program/divert/{bin,sbin,usr/bin,usr/sbin,lib/x86_64-linux-gnu,lib64} \
+    && apt-install.sh \
 ## Dind rootless tools
         fuse-overlayfs \
         rootlesskit \

@@ -24,7 +24,8 @@ ENV \
 ## Always use the latest version available for the current DEB distribution
 RUN \
     --mount=type=bind,source=./scripts,target=/usr/local/sbin,readonly \
-    apt-install.sh \
+    mkdir -p /run/program/divert/{bin,sbin,usr/bin,usr/sbin,lib/x86_64-linux-gnu,lib64} \
+    && apt-install.sh \
 ## Dind tools
         docker.io \
 ## Dockerd tools
